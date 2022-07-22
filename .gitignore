@@ -1,0 +1,30 @@
+.idea
+/build/
+dist/
+.cover/
+profile/
+
+# nsqd data from testing
+*.dat
+# Go.gitignore
+
+# Dynamic libs
+*.o
+*.a
+*.so
+
+# Folders
+_obj
+_test
+
+*.exe
+
+# vim stuff
+*.sw[op]
+
+config.toml
+
+/runtime/log/*
+/runtime/error/*
+/runtime/resume/*
+/runtime/task/*
