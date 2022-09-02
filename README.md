@@ -1,6 +1,6 @@
 ![datalink](./docs/guide/logo.jpg)
 
-MySQL数据同步到ElasticSearch中,解决全文检索的解决方案.
+MySQL数据同步到ElasticSearch中,全文检索的解决方案.
 
 优势:
 - 业务代码零侵入,不需要额外的业务代码.
@@ -10,6 +10,7 @@ MySQL数据同步到ElasticSearch中,解决全文检索的解决方案.
 ### 实现
 
 - MySQL的读写
+- Elasticsearch写入
 
 ## 项目结构
 
