@@ -4,6 +4,7 @@ dist/
 .cover/
 profile/
 
+
 # nsqd data from testing
 *.dat
 # Go.gitignore
@@ -22,9 +23,13 @@ _test
 # vim stuff
 *.sw[op]
 
-config.toml
 
+/app/datalink/*.exe
+/app/datalink/datalink
 /runtime/log/*
 /runtime/error/*
 /runtime/resume/*
 /runtime/task/*
+
+obs.prs
+config.toml

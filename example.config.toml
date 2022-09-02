@@ -1,0 +1,15 @@
+# !!!注意,程序的工作目录为项目根目录!!!
+# 指定运行CPU核
+core-number = 4
+
+# pipeline
+pipeline-worker-count = 1
+
+# linkd-host
+linkd-host = '0.0.0.0'
+
+# linkd-port
+linkd-port = '19191'
+
+# basic auth,admin:admin
+linkd-auth = 'admin:admin'

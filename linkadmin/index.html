@@ -1,0 +1,593 @@
+<html lang="zh">
+<head>
+    <title>datalink!</title>
+    <style>
+        html {
+            font-family: sans-serif;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            margin: 10px;
+        }
+
+        /* table css */
+        table {
+            white-space: nowrap;
+            table-layout: fixed;
+            border-collapse: collapse;
+            border-spacing: 0;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        td, th {
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .pure-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            empty-cells: show;
+            border: 1px solid #cbcbcb;
+        }
+
+        .pure-table caption {
+            color: #000;
+            font: italic 85%/1 arial, sans-serif;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        .pure-table td, .pure-table th {
+            border-left: 1px solid #cbcbcb;
+            font-size: inherit;
+            margin: 0;
+            overflow: hidden;
+            padding: .5em .5em;
+        }
+
+        .pure-table thead {
+            background-color: #e0e0e0;
+            color: #000;
+            text-align: left;
+            vertical-align: bottom;
+        }
+
+        .pure-table td {
+            background-color: transparent;
+        }
+
+        .pure-table-odd td {
+            background-color: #f2f2f2;
+        }
+
+        /* 按钮 css */
+        .button-24-blue {
+            background-color: #009de0;
+            border: 1px solid #009de0;
+        }
+
+        .button-24-green {
+            background-color: #0daf71;
+            border: 1px solid #0daf71;
+        }
+
+        .button-24-red {
+            background-color: #d64f48;
+            border: 1px solid #d64f48;
+        }
+
+        .button-24-primary {
+            background-color: #B0B0B0;
+            border: 1px solid #B0B0B0;
+        }
+
+        .button-24 {
+            border: 1px solid #FFFFFF;
+            border-radius: 3px;
+            box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            cursor: pointer;
+            display: inline-block;
+            outline: 0;
+            text-align: center;
+            text-rendering: geometricprecision;
+            text-transform: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .button-24-small {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 14px;
+            min-height: 30px;
+            padding: 8px 12px;
+        }
+
+        .button-24-mid {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 16px;
+            min-height: 40px;
+            padding: 10px 20px;
+        }
+
+        .button-clear {
+            float: right;
+            margin-top: 9px;
+        }
+
+        .button-24:hover,
+        .button-24:active {
+            opacity: 0.5;
+        }
+
+        .button-24:active {
+            opacity: .5;
+        }
+
+        /* 模态框 */
+        section {
+            width: 100%;
+            min-height: 200vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /** required styles */
+        .modal {
+            display: none;
+        }
+
+        .modal[open] {
+            display: block;
+        }
+
+        /** custom styles */
+        body {
+            line-height: 1.5em;
+            font-size: 16px;
+        }
+
+        .modal {
+            /** Nothing */
+        }
+
+        .modal__overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal__container {
+            background-color: #fff;
+            padding: .5rem;
+            max-width: 800px;
+            max-height: 200vh;
+            border-radius: 4px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .modal__header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: .5rem;
+        }
+
+        .modal__title {
+
+        }
+
+        .modal__close {
+            margin-left: auto;
+        }
+
+        .modal__content {
+            padding: .5rem;
+        }
+
+        .modal__footer {
+            padding: .5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-15%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal[open] .modal__overlay {
+            animation: modalFadeIn .3s ease-in;
+        }
+
+        .modal[open] .modal__container {
+            animation: modalSlideIn .3s ease-in;
+        }
+
+        .modal .modal__container,
+        .modal .modal__overlay {
+            will-change: transform;
+        }
+
+        .task-error-log {
+            display: inline-block;
+            padding: 5px 25px;
+            text-decoration: none;
+        }
+
+        a:link {
+            color: #d64f48;
+        }
+
+        a:visited {
+            color: #d64f48;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #task-content {
+            resize: none;
+            outline: none;
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/polipop.core.min.css"/>
+    <link rel="stylesheet" href="/static/css/polipop.default.min.css"/>
+</head>
+<body>
+
+<div style="max-width: 1200px;margin: 0 auto;">
+    <div id="toolbar" style="margin-bottom: 10px">
+        <button class="button-24 button-24-green button-24-mid" role="button" onclick="showAddTaskView('', true)">新增任务
+        </button>
+        <button class="button-24 button-24-green button-24-mid" role="button" onclick="reloadTask()">刷新列表</button>
+    </div>
+    <div style="padding: 3px 0;">
+        <button class="button-24 button-24-primary" onclick="clearInterval1(this)">停止刷新</button>
+        下次刷新时间:<span id="interval_refresh">5</span>s
+    </div>
+    <div>
+        <table class="pure-table" id="task_table">
+        </table>
+    </div>
+    <div>
+        <div class="modal" id="modal-1" area-hidden="true">
+            <div class="modal__overlay js-close-modal-trigger" tabindex="-1">
+                <div class="modal__container">
+                    <header class="modal__header">
+                        <h2 class="modal__title">任务内容</h2>
+                        <button class="modal__close" style="cursor: pointer" onclick="MinimalModal.close()">✕</button>
+                    </header>
+                    <main class="modal__content">
+                        <textarea name="content" id="task-content" cols="90" rows="30"></textarea>
+                    </main>
+                    <footer class="modal__footer">
+                        <button class="button-24 button-24-primary button-24-mid" onclick="MinimalModal.close()">关闭
+                        </button>
+                        <button class="button-24 button-24-green button-24-mid" id="task-content-add-btn"
+                                onclick="addTask()">添加任务
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="/static/js/axios.min.js"></script>
+<script src="/static/js/polipop.min.js"></script>
+<script src="/static/js/minimal-modal.min.js"></script>
+<script type="text/javascript">
+
+    function prettyFormat(code) {
+        try {
+            for (const key in code) {
+                if (typeof code[key] === 'function') {
+                    let str = code[key];
+                    str = str.toString();
+                    code[key] = str.replace(/\n/g, '<br/>');
+                }
+            }
+            let str = JSON.stringify(code, null, 2);
+            str = str.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+            return str;
+        } catch (e) {
+            console.error('异常信息:' + e);
+            return '';
+        }
+    }
+
+    let polipop = new Polipop('mypolipop', {
+        closer: false,
+        position: 'center',
+        layout: 'popups',
+        insert: 'before',
+        life: 4000,
+        pool: 0,
+        sticky: false,
+        pauseOnHover: true
+    });
+
+    function showPop(type, msg, reload) {
+        if (type === 'success') {
+            polipop.add({
+                type: 'success',
+                title: '提示',
+                content: msg + '成功',
+                close: function (notification, element) {
+                    if (reload) {
+                        reloadTask()
+                    }
+                }
+            });
+            return
+        }
+        if (type === 'error') {
+            polipop.add({
+                type: 'error',
+                title: '提示',
+                content: msg + '失败'
+            });
+        }
+    }
+
+    function formatDate(ts) {
+        const time = new Date(parseInt(ts) * 1000);
+        const y = time.getFullYear();  //年
+        let m = time.getMonth() + 1;  //月
+        if (m < 10) {
+            m = '0' + m
+        }
+        let d = time.getDate();  //日
+        if (d < 10) {
+            d = '0' + d
+        }
+        let h = time.getHours();  //时
+        if (h < 10) {
+            h = '0' + h
+        }
+        let mm = time.getMinutes();  //分
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        let s = time.getSeconds();  //秒
+        if (s < 10) {
+            s = '0' + s
+        }
+        return y + "-" + m + "-" + d + " " + h + ":" + mm + ":" + s;
+    }
+
+    function renderTable(arr) {
+        document.getElementById('task_table').innerHTML = '\n' +
+            '<tr class="pure-table-odd">' +
+            '<th style="width: 32px">序号</th>' +
+            '<th style="width: 70px">同步模式</th>' +
+            '<th style="width: 70px">任务状态</th>' +
+            '<th>描述</th>' +
+            '<th style="width: 160px">启动时间</th>' +
+            '<th style="width: 90px">读取数量</th>' +
+            '<th style="width: 90px">失败数量</th>' +
+            '<th style="width: 90px">速度</th>' +
+            '<th style="width: 164px">操作</th>' +
+            '</tr>'
+        arr.forEach((item, index, array) => {
+            const obj = document.createElement("tr");
+            if (index % 2 === 0) {
+                obj.setAttribute("class", "pure-table-odd")
+            }
+            let str = '';
+            str += '<td>' + (index + 1) + '</td>';
+            str += '<td>' + item.SyncMode + '</td>';
+            let sm = '';
+            if (item.HealthState === 'green') {
+                sm = '#0DAF71';
+            } else if (item.HealthState === 'red') {
+                sm = '#D64F48';
+            } else if (item.HealthState === 'yellow') {
+                sm = '#FEAE1B';
+            }
+            if (item.State === "stop") {
+                let fv = '<a href="/task_error?uuid=' + item.Uuid + '" class="task-error-log" target="_blank" >' + item.State + '</a>';
+                str += '<td style="color:' + sm + '">' + fv + '</td>';
+            } else {
+                str += '<td style="color:' + sm + '">' + item.State + '</td>';
+            }
+            str += '<td align="left">' + item.Desc + '</td>';
+            let ts = ' - '
+            if (item.LatestRunStartAt > 0) {
+                ts = formatDate(item.LatestRunStartAt)
+            }
+            str += '<td>' + ts + '</td>';
+            str += '<td>' + item.FullReadCount + '</td>';
+            let fv = (item.FailedDeliveryCount + item.FailedPipeLineCount)
+            if (fv > 0) {
+                fv = '<a href="/task_error?uuid=' + item.Uuid + '" class="task-error-log" target="_blank" >' + fv + '</a>';
+            }
+            str += '<td>' + fv + '</td>';
+            str += '<td>' + item.PreSec + '</td>';
+            str += '<td align="right">'
+            if (item.State === 'null'
+                || item.State === 'done'
+                || item.State === 'stop') {
+                str += '<button class="button-24 button-24-blue button-24-small" role="button" onClick="startTask(\'' + item.Uuid + '\')">启动</button>'
+                str += '<button class="button-24 button-24-primary button-24-small" role="button" onClick="detailTask(\'' + item.Uuid + '\')">详情</button>'
+                str += '<button class="button-24 button-24-red button-24-small" role="button" onClick="removeTask(\'' + item.Uuid + '\')">删除</button>'
+            }
+            if (item.State === 'running') {
+                str += '<button class="button-24 button-24-blue button-24-small" role="button" onClick="stopTask(\'' + item.Uuid + '\')">暂停</button>'
+                str += '<button class="button-24 button-24-primary button-24-small" role="button" onClick="detailTask(\'' + item.Uuid + '\')">详情</button>'
+            }
+            str += '</td>';
+            obj.innerHTML = str;
+            document.getElementById('task_table').appendChild(obj);
+        })
+    }
+
+    function reloadTask() {
+        axios.get('/tasks').then(function (res) {
+            if (!!res.data.code && res.data.code === "10000") {
+                renderTable(res.data.data)
+            } else {
+                showPop('error', '加载任务列表', false)
+            }
+        }).catch(function (error) {
+            showPop('error', '加载任务列表', false)
+        }).then(function () {
+        });
+    }
+
+    function clearTask() {
+        axios.delete('/tasks/clear').then(function (res) {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', '清空任务', true)
+            } else {
+                showPop('error', '清空任务', false)
+            }
+        })
+    }
+
+    function startTask(uuid) {
+        axios.post('/task', {"uuid": uuid, "op": "start"}).then(res => {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', '启动任务', true)
+            } else {
+                showPop('error', '启动任务', false)
+            }
+        })
+    }
+
+    function stopTask(uuid) {
+        axios.post('/task', {"uuid": uuid, "op": "stop"}).then(res => {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', '暂停任务', true)
+            } else {
+                showPop('error', '暂停任务', false)
+            }
+        })
+    }
+
+    function removeTask(uuid) {
+        axios.delete('/task', {"data": {"uuid": uuid}}).then(res => {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', '删除任务', true)
+            } else {
+                polipop.add({
+                    type: 'error',
+                    title: '提示',
+                    content: res.data.msg
+                });
+            }
+        })
+    }
+
+    function detailTask(uuid) {
+        axios.get('/_detail?uuid=' + uuid).then(res => {
+            if (!!res.data) {
+                let ddd = prettyFormat(res.data)
+                showAddTaskView(ddd, false)
+            } else {
+                showPop('error', '获取详情', false)
+            }
+        })
+    }
+
+    function showAddTaskView(val, showBtn) {
+        const modal = document.querySelector("#modal-1");
+        document.getElementById("task-content").value = val
+        if (typeof showBtn == "boolean" && showBtn) {
+            document.getElementById("task-content-add-btn").style.display = 'initial'
+        } else {
+            document.getElementById("task-content-add-btn").style.display = 'none'
+        }
+        MinimalModal.show(modal);
+    }
+
+    function addTask() {
+        const txt = document.getElementById("task-content").value;
+        if (txt === "") {
+            return;
+        }
+        const val = JSON.parse(txt)
+        axios.put('/task', val).then(res => {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', '添加任务', true)
+                document.getElementById("task-content").value = ""
+            } else {
+                polipop.add({
+                    type: 'error',
+                    title: '提示',
+                    content: res.data.msg
+                });
+            }
+            MinimalModal.close()
+        })
+    }
+
+    // 定时器
+    let interval1 = null;
+    let sec = 4;
+
+    function clearInterval1(ele) {
+        if (interval1) {
+            ele.innerHTML = "点击自动刷新";
+            clearInterval(interval1)
+            interval1 = null;
+            return;
+        }
+        runInterval1(ele);
+    }
+
+    function runInterval1(ele) {
+        if (typeof ele !== 'undefined') {
+            ele.innerHTML = "停止刷新"
+        }
+        interval1 = setInterval(function () {
+            document.getElementById("interval_refresh").innerHTML = sec.toString();
+            sec = sec - 1;
+            if (sec < 0) {
+                sec = 5;
+                reloadTask()
+            }
+        }, 1000);
+    }
+
+    window.onload = function () {
+        reloadTask()
+        runInterval1()
+    }
+
+</script>
+</body>
+</html>

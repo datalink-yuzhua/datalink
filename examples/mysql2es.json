@@ -1,0 +1,122 @@
+{
+    "setup": {
+        "desc": "from mysql to elasticsearch",
+        "error_record": true
+    },
+    "resource": [
+        {
+            "id": "a9e96c08-56de-4d97-a504-59ddaccee8c6",
+            "desc": "mysql服务器",
+            "type": "mysql",
+            "user": "root",
+            "pass": "root",
+            "host": "127.0.0.1",
+            "port": "3306",
+            "dsn": ""
+        },
+        {
+            "id": "c888b053-45f3-4c98-b219-8acfe67999d1",
+            "desc": "数据库",
+            "type": "mysql",
+            "user": "root",
+            "pass": "root",
+            "host": "127.0.0.1",
+            "port": "3306",
+            "dsn": ""
+        },
+        {
+            "extra": null,
+            "host": "db-01.yuzhua-test.com",
+            "id": "bf907d93-e499-449f-92f2-cd2f057450bc",
+            "pass": "Ie#5D8FG@4fC7gJ9y+",
+            "port": "43092",
+            "type": "elasticsearch",
+            "desc": "搜索服务",
+            "dsn": "http://db-01.yuzhua-test.com:43092",
+            "user": "elastic"
+        }
+    ],
+    "source": [
+        {
+            "resource_id": "a9e96c08-56de-4d97-a504-59ddaccee8c6",
+            "sync_mode": "direct",
+            "document_set": "test.country",
+            "extra": {
+            }
+        },
+        {
+            "resource_id": "c888b053-45f3-4c98-b219-8acfe67999d1",
+            "sync_mode": "empty",
+            "document_set": "",
+            "extra": {
+            }
+        }
+    ],
+    "target": [
+        {
+            "resource_id": "bf907d93-e499-449f-92f2-cd2f057450bc",
+            "document_set": {
+                "test.country": "test_country_001"
+            },
+            "extra": {
+            }
+        }
+    ],
+    "pipeline": [
+        {
+            "document_set": "test.country",
+            "flow": [
+                {
+                    "type": "map",
+                    "script": "module.exports=function(doc){doc.attr1=2022;return doc;}"
+                },
+                {
+                    "type": "filter",
+                    "script": "module.exports=function(doc){return doc.id>100;}"
+                },
+                {
+                    "type": "mapInline",
+                    "field_map": [
+                        {
+                            "srcField": "id",
+                            "srcType": "long",
+                            "aimField": "tab_id",
+                            "aimType": "long"
+                        },
+                        {
+                            "srcField": "code",
+                            "srcType": "string",
+                            "aimField": "tab_code",
+                            "aimType": "string"
+                        },
+                        {
+                            "srcField": "name",
+                            "srcType": "string",
+                            "aimField": "tab_name",
+                            "aimType": "string"
+                        }
+                    ]
+                },
+                {
+                    "type": "relateInline",
+                    "assoc_type": "11",
+                    "script": "",
+                    "relate_resource_id": "c888b053-45f3-4c98-b219-8acfe67999d1",
+                    "relate_document_set": "test.country_cate",
+                    "layer_type": "sib",
+                    "sub_label": "",
+                    "field_map": {
+                        "r.id": "cate_id"
+                    },
+                    "wheres": [
+                        {
+                            "src_field": "cate",
+                            "operator": "=",
+                            "rel_field": "id"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

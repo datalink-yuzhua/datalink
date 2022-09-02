@@ -1,0 +1,38 @@
+{
+  "setup": {
+    "desc": "mysql to mysql stream",
+    "error_record": true
+  },
+  "resource": [
+    {
+      "id": "a9e96c08-56de-4d97-a504-59ddaccee8c6",
+      "desc": "关系型数据库",
+      "type": "mysql",
+      "user": "root",
+      "pass": "root",
+      "host": "127.0.0.1",
+      "port": "3306",
+      "dsn": ""
+    }
+  ],
+  "source": [
+    {
+      "resource_id": "a9e96c08-56de-4d97-a504-59ddaccee8c6",
+      "sync_mode": "stream",
+      "document_set": "test.student_tab",
+      "extra": {
+        "limit": 1000
+      }
+    }
+  ],
+  "target": [
+    {
+      "resource_id": "a9e96c08-56de-4d97-a504-59ddaccee8c6",
+      "document_set": {
+        "test.student_tab": "test.student_tab_copy2"
+      },
+      "extra": {}
+    }
+  ],
+  "pipeline": []
+}
