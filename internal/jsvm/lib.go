@@ -70,12 +70,14 @@ func pad(vm *otto.Otto) error {
 	return vm.Set("pad", func(call otto.FunctionCall) otto.Value {
 		params := call.ArgumentList
 
-		direction := 0
+		direction := "l"
 		switch len(params) {
 		case 3:
 		case 4:
-			d, _ := call.Argument(3).ToInteger()
-			direction = int(d)
+			d, _ := call.Argument(3).ToString()
+			if d == "l" || d == "r" {
+				direction = d
+			}
 		default:
 			return otto.NullValue()
 		}
@@ -90,9 +92,10 @@ func pad(vm *otto.Otto) error {
 		}
 
 		var b strings.Builder
-		if direction == 0 {
+		if direction == "l" {
 			b.WriteString(helper.StrReverse(s))
-			c = helper.StrReverse(c)
+		} else {
+			b.WriteString(s)
 		}
 
 		for i := 0; i < n-sl; i++ {
@@ -100,7 +103,7 @@ func pad(vm *otto.Otto) error {
 		}
 
 		r := ""
-		if direction == 0 {
+		if direction == "l" {
 			r = helper.StrReverse(b.String())
 		} else {
 			r = b.String()
