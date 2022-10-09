@@ -758,12 +758,12 @@ func (_this *MySQLReader) transCanalMessage(e *canal.RowsEvent, opC chan *msg.Op
 			}
 		}
 	case canal.DeleteAction:
-		if len(e.Rows) == 1 {
-			var docId string
-			docIdField := _this.getTablePKField(e)
+		var docId string
+		docIdField := _this.getTablePKField(e)
+		for _, row := range e.Rows {
 			originDoc := map[string]interface{}{}
 			for i, c := range e.Table.Columns {
-				originDoc[c.Name] = _this.makeColumnData(&c, e.Rows[0][i])
+				originDoc[c.Name] = _this.makeColumnData(&c, row[i])
 				if c.Name == docIdField {
 					id, ok := originDoc[c.Name]
 					if ok {
@@ -790,9 +790,6 @@ func (_this *MySQLReader) transCanalMessage(e *canal.RowsEvent, opC chan *msg.Op
 				opC <- op
 			}
 		}
-	default:
-		// 不支持其他日志
-		return nil
 	}
 	return nil
 }
