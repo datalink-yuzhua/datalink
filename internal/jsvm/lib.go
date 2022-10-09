@@ -52,9 +52,10 @@ func Lib(vm *otto.Otto, funs []string) error {
 func ifnull(vm *otto.Otto) error {
 	return vm.Set("ifnull", func(call otto.FunctionCall) otto.Value {
 		v := call.Argument(0)
-		if v.IsUndefined() || v.IsNull() || v.IsNaN() {
+		if v.IsUndefined() || v.IsNull() {
 			return call.Argument(1)
 		}
+		// NaN 和 +INF,-INF没有考虑
 		if v.IsString() {
 			s, _ := v.ToString()
 			if s == "" {
@@ -73,6 +74,7 @@ func pad(vm *otto.Otto) error {
 		direction := "l"
 		switch len(params) {
 		case 3:
+			// pass
 		case 4:
 			d, _ := call.Argument(3).ToString()
 			if d == "l" || d == "r" {
@@ -113,24 +115,49 @@ func pad(vm *otto.Otto) error {
 	})
 }
 
-// trim 去掉空白字符 trim(str)
+// trim 去掉空白字符 trim(str, ch, d)
 func trim(vm *otto.Otto) error {
 	return vm.Set("trim", func(call otto.FunctionCall) otto.Value {
-		params := call.ArgumentList
-		str := ""
-		switch len(params) {
-		case 1:
-			str, _ = call.Argument(0).ToString()
-		default:
+		l := len(call.ArgumentList)
+		if l > 3 || l == 0 {
 			return otto.NullValue()
 		}
-		c1 := rune(0x20) // 普通空格符
-		c2 := rune(0x09) // 制表符
-		c3 := rune(0x0A) // 换行符
-		c4 := rune(0x0D) // 回车符
-		c5 := rune(0x00) // 空字节符
-		c6 := rune(0x0B) // 垂直制表符
-		str = strings.Trim(str, string([]rune{c1, c2, c3, c4, c5, c6}))
+
+		var chs []rune
+		v1 := call.Argument(0)
+		if v1.IsNull() || v1.IsUndefined() {
+			return otto.NullValue()
+		}
+		str, _ := v1.ToString()
+		if l == 1 {
+			c1 := rune(0x20) // 普通空格符
+			c2 := rune(0x09) // 制表符
+			c3 := rune(0x0A) // 换行符
+			c4 := rune(0x0D) // 回车符
+			c5 := rune(0x00) // 空字节符
+			c6 := rune(0x0B) // 垂直制表符
+			chs = []rune{c1, c2, c3, c4, c5, c6}
+		}
+		if l > 1 {
+			ch, _ := call.Argument(1).ToString()
+			chs = []rune(ch)
+		}
+		// both
+		d := "b"
+		if l > 2 {
+			d, _ = call.Argument(2).ToString()
+			if !(d == "r" || d == "l" || d == "b") {
+				d = "b"
+			}
+		}
+		switch d {
+		case "r":
+			str = strings.TrimRight(str, string(chs))
+		case "l":
+			str = strings.TrimLeft(str, string(chs))
+		case "b":
+			str = strings.Trim(str, string(chs))
+		}
 		result, _ := vm.ToValue(str)
 		return result
 	})
@@ -216,7 +243,7 @@ func strtotime(vm *otto.Otto) error {
 		default:
 			return otto.NullValue()
 		}
-		t, err := time.Parse(layout, d)
+		t, err := time.ParseInLocation(layout, d, time.Local)
 		if err != nil {
 			return otto.NullValue()
 		}
@@ -284,7 +311,7 @@ func round(vm *otto.Otto) error {
 	})
 }
 
-// rand 随机数
+// rand 随机数 包含min不包含max
 func rand(vm *otto.Otto) error {
 	return vm.Set("rand", func(call otto.FunctionCall) otto.Value {
 		params := call.ArgumentList
@@ -428,24 +455,9 @@ func min(vm *otto.Otto) error {
 func isNumber(vm *otto.Otto) error {
 	return vm.Set("isNumber", func(call otto.FunctionCall) otto.Value {
 		val := call.Argument(0)
-		_, err := val.ToInteger()
-		if err == nil {
-			return otto.TrueValue()
-		}
-		_, err = val.ToFloat()
-		if err == nil {
+		if val.IsNumber() {
 			return otto.TrueValue()
 		}
 		return otto.FalseValue()
-	})
-}
-
-// Foo 演示
-func Foo(vm *otto.Otto) error {
-	return vm.Set("pad", func(call otto.FunctionCall) otto.Value {
-		//params := call.ArgumentList
-		d, _ := call.Argument(3).ToInteger()
-		result, _ := vm.ToValue(d)
-		return result
 	})
 }
