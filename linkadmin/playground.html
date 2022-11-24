@@ -45,38 +45,34 @@
 
     function codeFormat() {
         var t = editor.getValue().replace(/^\s+/, "");
-        {
-            if (t) {
-                var e = 4
-                var n = " ";
-                return 1 == e && (n = "\t"),
-                    t && "<" === t.charAt(0) ? editor.setValue(style_html(t, e, n, 80)) : editor.setValue(js_beautify(t, e, n)),
-                    !1
-            }
-            showPop('error', '格式化的代码不能为空')
+        if (t) {
+            var e = 4
+            var n = " ";
+            return editor.setValue(js_beautify(t, e, n))
         }
+        showPop('error', '格式化的代码值')
     }
 
     function codeCompress() {
         const e = editor.getValue().replace(/^\s+|\s+$/g, "");
-        if ("" !== e) {
-            var n = new Packer;
-            var i = n.pack(e, 0, 0);
-            editor.setValue(i)
-            codeCopy()
-        } else {
+        if ("" === e) {
             showPop('error', '压缩&复制')
         }
-
+        var n = new Packer;
+        var i = n.pack(e, 0, 0);
+        editor.setValue(i)
     }
 
-    function codeCopy() {
-        new ClipboardJS("#zipCopy", {
-            text: function (t) {
-                return !!editor.getValue() && (showPop('success', '压缩&复制', true), editor.getValue())
+    new ClipboardJS("#zipCopy", {
+        text: function (t) {
+            let c = editor.getValue()
+            if (c === "") {
+                return ""
             }
-        })
-    }
+            showPop('success', '压缩&复制')
+            return editor.getValue()
+        }
+    })
 
     var codeArea = document.getElementById('code');
     var editor = CodeMirror.fromTextArea(codeArea, {
@@ -87,9 +83,7 @@
         matchBrackets: true,
         lineWrapping: true,
         theme: 'monokai',
-        // value: "function myScript(){return 100;}\n",
     });
-
 
     let polipop = new Polipop('mypolipop', {
         closer: false,
@@ -103,17 +97,14 @@
     });
 
     function showPop(type, msg) {
+        console.log(type)
         if (type === 'success') {
             polipop.add({
                 type: 'success',
                 title: '提示',
-                content: msg + '成功',
-                close: function (notification, element) {
-                }
+                content: msg + '成功'
             });
-            return
-        }
-        if (type === 'error') {
+        } else if (type === 'error') {
             polipop.add({
                 type: 'error',
                 title: '提示',
