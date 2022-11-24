@@ -41,74 +41,6 @@
             background-color: #f2f2f2;
         }
 
-        /* 按钮 css */
-        .button-24-blue {
-            background-color: #009de0;
-            border: 1px solid #009de0;
-        }
-
-        .button-24-green {
-            background-color: #0daf71;
-            border: 1px solid #0daf71;
-        }
-
-        .button-24-red {
-            background-color: #d64f48;
-            border: 1px solid #d64f48;
-        }
-
-        .button-24-primary {
-            background-color: #B0B0B0;
-            border: 1px solid #B0B0B0;
-        }
-
-        .button-24 {
-            border: 1px solid #FFFFFF;
-            border-radius: 3px;
-            box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
-            box-sizing: border-box;
-            color: #FFFFFF;
-            cursor: pointer;
-            display: inline-block;
-            outline: 0;
-            text-align: center;
-            text-rendering: geometricprecision;
-            text-transform: none;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-
-        .button-24-small {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 14px;
-            min-height: 30px;
-            padding: 8px 12px;
-        }
-
-        .button-24-mid {
-            font-size: 16px;
-            font-weight: 800;
-            line-height: 16px;
-            min-height: 40px;
-            padding: 10px 20px;
-        }
-
-        .button-clear {
-            float: right;
-            margin-top: 9px;
-        }
-
-        .button-24:hover,
-        .button-24:active {
-            opacity: 0.5;
-        }
-
-        .button-24:active {
-            opacity: .5;
-        }
-
         /* 模态框 */
         section {
             width: 100%;
@@ -116,117 +48,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        /** required styles */
-        .modal {
-            display: none;
-        }
-
-        .modal[open] {
-            display: block;
-        }
-
-        /** custom styles */
-        body {
-            line-height: 1.5em;
-            font-size: 16px;
-        }
-
-        .modal {
-            /** Nothing */
-        }
-
-        .modal__overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal__container {
-            background-color: #fff;
-            padding: .5rem;
-            max-width: 800px;
-            max-height: 200vh;
-            border-radius: 4px;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
-
-        .modal__header {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding: .5rem;
-        }
-
-        .modal__title {
-
-        }
-
-        .modal__close {
-            margin-left: auto;
-        }
-
-        .modal__content {
-            padding: .5rem;
-        }
-
-        .modal__footer {
-            padding: .5rem;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                transform: translateY(-15%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        .modal[open] .modal__overlay {
-            animation: modalFadeIn .3s ease-in;
-        }
-
-        .modal[open] .modal__container {
-            animation: modalSlideIn .3s ease-in;
-        }
-
-        .modal .modal__container,
-        .modal .modal__overlay {
-            will-change: transform;
-        }
-
-        .task-error-log {
-            display: inline-block;
-            padding: 5px 25px;
-            text-decoration: none;
-        }
-
-        a:visited {
-            color: #ffffff;
-        }
-
-        a:hover {
-            text-decoration: underline;
         }
 
         #task-content {
@@ -281,7 +102,7 @@
 
 <script src="/static/js/axios.min.js"></script>
 <script src="/static/lib/polipop/polipop.min.js"></script>
-<script src="/static/lib/polipop/minimal-modal.min.js"></script>
+<script src="/static/js/minimal-modal.min.js"></script>
 <script type="text/javascript">
 
     function prettyFormat(code) {
@@ -512,7 +333,13 @@
         if (txt === "") {
             return;
         }
-        const val = JSON.parse(txt)
+        let val
+        try {
+            val = JSON.parse(txt)
+        } catch (e) {
+            console.error('异常信息:' + e);
+            return '';
+        }
         axios.put('/task', val).then(res => {
             if (!!res.data.code && res.data.code === "10000") {
                 showPop('success', '添加任务', true)

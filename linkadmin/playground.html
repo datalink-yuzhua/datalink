@@ -2,29 +2,124 @@
 <head>
     <title>playground!</title>
     <style>
+        #editor {
+            width: 80%;
+            height: 410px;
+        }
+
+        .CodeMirror {
+            height: 400px !important;
+        }
     </style>
     <link rel="stylesheet" href="/static/css/app.css"/>
+    <link rel="stylesheet" href="/static/lib/polipop/polipop.core.min.css"/>
+    <link rel="stylesheet" href="/static/lib/polipop/polipop.default.min.css"/>
     <link rel="stylesheet" href="/static/lib/codemirror/codemirror.css"/>
+    <link rel="stylesheet" href="/static/lib/codemirror/monokai.css"/>
 </head>
 <body>
 <div style="max-width: 1200px;margin: 0 auto;">
-    <div id="editor" style="width: 80%;height: 80%;border: 1px solid gray;">
+    <div id="editor">
         <textarea id="code" name="code" style="display: none"></textarea>
+    </div>
+    <div id="toolbar" style="margin-bottom: 10px">
+        <button class="button-24 button-24-green button-24-mid" role="button" onclick="codeRun()">Play</button>
+        <button class="button-24 button-24-green button-24-mid" role="button" onclick="codeFormat()">格式化</button>
+        <button class="button-24 button-24-green button-24-mid" role="button" id="zipCopy" onclick="codeCompress()">
+            压缩&复制
+        </button>
     </div>
 </div>
 
 <script src="/static/lib/codemirror/codemirror.js"></script>
 <script src="/static/lib/codemirror/mode/javascript/javascript.js"></script>
+<script src="/static/lib/format/base.js"></script>
+<script src="/static/lib/format/jsformat.js"></script>
+<script src="/static/lib/polipop/polipop.min.js"></script>
+<script src="/static/js/clipboard.min.js"></script>
 <script type="text/javascript">
-    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {//定义CodeMirror代码编辑器
-        lineNumbers: true,     // 显示行号
-        indentUnit: 4,         // 缩进单位为4
-        styleActiveLine: true, // 当前行背景高亮
-        matchBrackets: true,   // 括号匹配
-        mode: 'htmlmixed',     // HMTL混合模式
-        lineWrapping: true,    // 自动换行
-        theme: 'monokai',      // 编辑器主题
+
+    function codeRun() {
+        //    TODO:使用虚拟机运行代码
+    }
+
+    function codeFormat() {
+        var t = editor.getValue().replace(/^\s+/, "");
+        {
+            if (t) {
+                var e = 4
+                var n = " ";
+                return 1 == e && (n = "\t"),
+                    t && "<" === t.charAt(0) ? editor.setValue(style_html(t, e, n, 80)) : editor.setValue(js_beautify(t, e, n)),
+                    !1
+            }
+            showPop('error', '格式化的代码不能为空')
+        }
+    }
+
+    function codeCompress() {
+        const e = editor.getValue().replace(/^\s+|\s+$/g, "");
+        if ("" !== e) {
+            var n = new Packer;
+            var i = n.pack(e, 0, 0);
+            editor.setValue(i)
+            codeCopy()
+        } else {
+            showPop('error', '压缩&复制')
+        }
+
+    }
+
+    function codeCopy() {
+        new ClipboardJS("#zipCopy", {
+            text: function (t) {
+                return !!editor.getValue() && (showPop('success', '压缩&复制', true), editor.getValue())
+            }
+        })
+    }
+
+    var codeArea = document.getElementById('code');
+    var editor = CodeMirror.fromTextArea(codeArea, {
+        mode: 'javascript',
+        lineNumbers: true,
+        indentUnit: 4,
+        styleActiveLine: true,
+        matchBrackets: true,
+        lineWrapping: true,
+        theme: 'monokai',
+        // value: "function myScript(){return 100;}\n",
     });
 
+
+    let polipop = new Polipop('mypolipop', {
+        closer: false,
+        position: 'center',
+        layout: 'popups',
+        insert: 'before',
+        life: 2000,
+        pool: 0,
+        sticky: false,
+        pauseOnHover: true
+    });
+
+    function showPop(type, msg) {
+        if (type === 'success') {
+            polipop.add({
+                type: 'success',
+                title: '提示',
+                content: msg + '成功',
+                close: function (notification, element) {
+                }
+            });
+            return
+        }
+        if (type === 'error') {
+            polipop.add({
+                type: 'error',
+                title: '提示',
+                content: msg + '失败'
+            });
+        }
+    }
 </script>
 </body>
