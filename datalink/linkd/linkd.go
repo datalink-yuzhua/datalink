@@ -107,6 +107,7 @@ func (d *Linkd) routeMap() *httprouter.Router {
 
 	router := httprouter.New()
 	router.GET("/", Index)
+	router.GET("/playground", playground)
 
 	// 设置了密码使用认证
 	user, pass, ok := conf.G.GetBasicAuth()

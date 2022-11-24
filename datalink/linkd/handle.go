@@ -64,6 +64,19 @@ func DebugUI(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	fmt.Fprint(w, string(bts))
 }
 
+// playground otto虚拟机测试
+func playground(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	wd, _ := os.Getwd()
+	file := fmt.Sprintf("%s/linkadmin/playground.html", wd)
+	_, err := helper.PathExists(file)
+	if err != nil {
+		outputError2(w, "错误 !")
+		return
+	}
+	bts, _ := ioutil.ReadFile(file)
+	fmt.Fprint(w, string(bts))
+}
+
 // 将输入转为JSON
 func formatBodyJSON(r *http.Request) (in map[string]interface{}, err error) {
 	io := r.Body

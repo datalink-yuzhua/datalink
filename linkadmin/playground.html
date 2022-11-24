@@ -1,0 +1,30 @@
+<html lang="zh">
+<head>
+    <title>playground!</title>
+    <style>
+    </style>
+    <link rel="stylesheet" href="/static/css/app.css"/>
+    <link rel="stylesheet" href="/static/lib/codemirror/codemirror.css"/>
+</head>
+<body>
+<div style="max-width: 1200px;margin: 0 auto;">
+    <div id="editor" style="width: 80%;height: 80%;border: 1px solid gray;">
+        <textarea id="code" name="code" style="display: none"></textarea>
+    </div>
+</div>
+
+<script src="/static/lib/codemirror/codemirror.js"></script>
+<script src="/static/lib/codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {//定义CodeMirror代码编辑器
+        lineNumbers: true,     // 显示行号
+        indentUnit: 4,         // 缩进单位为4
+        styleActiveLine: true, // 当前行背景高亮
+        matchBrackets: true,   // 括号匹配
+        mode: 'htmlmixed',     // HMTL混合模式
+        lineWrapping: true,    // 自动换行
+        theme: 'monokai',      // 编辑器主题
+    });
+
+</script>
+</body>

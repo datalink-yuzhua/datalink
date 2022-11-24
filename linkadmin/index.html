@@ -2,30 +2,6 @@
 <head>
     <title>datalink!</title>
     <style>
-        html {
-            font-family: sans-serif;
-            -ms-text-size-adjust: 100%;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        body {
-            margin: 10px;
-        }
-
-        /* table css */
-        table {
-            white-space: nowrap;
-            table-layout: fixed;
-            border-collapse: collapse;
-            border-spacing: 0;
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        td, th {
-            overflow: hidden;
-            padding: 0;
-        }
 
         .pure-table {
             width: 100%;
@@ -245,12 +221,8 @@
             text-decoration: none;
         }
 
-        a:link {
-            color: #d64f48;
-        }
-
         a:visited {
-            color: #d64f48;
+            color: #ffffff;
         }
 
         a:hover {
@@ -262,8 +234,8 @@
             outline: none;
         }
     </style>
-    <link rel="stylesheet" href="/static/css/polipop.core.min.css"/>
-    <link rel="stylesheet" href="/static/css/polipop.default.min.css"/>
+    <link rel="stylesheet" href="/static/lib/polipop/polipop.core.min.css"/>
+    <link rel="stylesheet" href="/static/lib/polipop/polipop.default.min.css"/>
 </head>
 <body>
 
@@ -272,6 +244,7 @@
         <button class="button-24 button-24-green button-24-mid" role="button" onclick="showAddTaskView('', true)">新增任务
         </button>
         <button class="button-24 button-24-green button-24-mid" role="button" onclick="reloadTask()">刷新列表</button>
+        <a class="button-24 button-24-primary button-24-small" href="/playground" target="_blank">Playground</a>
     </div>
     <div style="padding: 3px 0;">
         <button class="button-24 button-24-primary" onclick="clearInterval1(this)">停止刷新</button>
@@ -307,8 +280,8 @@
 </div>
 
 <script src="/static/js/axios.min.js"></script>
-<script src="/static/js/polipop.min.js"></script>
-<script src="/static/js/minimal-modal.min.js"></script>
+<script src="/static/lib/polipop/polipop.min.js"></script>
+<script src="/static/lib/polipop/minimal-modal.min.js"></script>
 <script type="text/javascript">
 
     function prettyFormat(code) {

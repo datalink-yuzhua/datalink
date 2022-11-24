@@ -1,0 +1,24 @@
+html {
+    font-family: sans-serif;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 10px;
+}
+
+/* table css */
+table {
+    white-space: nowrap;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    vertical-align: middle;
+    text-align: center;
+}
+
+td, th {
+    overflow: hidden;
+    padding: 0;
+}
