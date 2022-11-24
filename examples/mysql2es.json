@@ -26,13 +26,13 @@
         },
         {
             "extra": null,
-            "host": "db-01.yuzhua-test.com",
+            "host": "",
             "id": "bf907d93-e499-449f-92f2-cd2f057450bc",
-            "pass": "Ie#5D8FG@4fC7gJ9y+",
-            "port": "43092",
+            "pass": "",
+            "port": "",
             "type": "elasticsearch",
             "desc": "搜索服务",
-            "dsn": "http://db-01.yuzhua-test.com:43092",
+            "dsn": "",
             "user": "elastic"
         }
     ],
