@@ -16,7 +16,7 @@
         }
 
         .CodeMirror {
-            height: 500px !important;
+            height: 550px !important;
         }
 
         .CodeMirror-scroll {
@@ -41,7 +41,8 @@
     </div>
     <div id="funcs">
         <ul>
-            <li>ifnull(value, default) 判断空</li>
+            <li style="list-style-type: none"><b>内置函数</b></li>
+            <li>ifnull(value, default) 判断null</li>
             <li>pad(str, pad_char, number, direction) 填充字符串</li>
             <li>trim(str, ch, direction) 去掉字符串两边字符</li>
             <li>startwith(str, prefix) 检查字符串是否以指定字符开始</li>
@@ -138,7 +139,7 @@
         theme: 'monokai',
         gutters: ['error'],
     });
-    editor.setValue("module.exports = function(doc, op, tab){\n// code there...\n    return doc;\n}")
+    editor.setValue("module.exports = function(doc, op, tab){\n    // code there...\n    return doc;\n}")
 
     let polipop = new Polipop('mypolipop', {
         closer: false,
