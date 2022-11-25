@@ -33,6 +33,9 @@
     <link rel="stylesheet" href="/static/lib/polipop/polipop.default.min.css"/>
     <link rel="stylesheet" href="/static/lib/codemirror/codemirror.css"/>
     <link rel="stylesheet" href="/static/lib/codemirror/monokai.css"/>
+    <link rel="stylesheet" href="/static/lib/codemirror/addon/fold/foldgutter.css"/>
+    <link rel="stylesheet" href="/static/lib/codemirror/addon/hint/show-hint.css"/>
+    <link rel="stylesheet" href="/static/lib/codemirror/addon/lint/lint.css"/>
 </head>
 <body>
 <div style="max-width: 1200px;margin: 20px auto;">
@@ -72,20 +75,31 @@
     </div>
 </div>
 
-<script src="/static/js/axios.min.js"></script>
-<script src="/static/lib/codemirror/codemirror.js"></script>
-<script src="/static/lib/codemirror/mode/javascript/javascript.js"></script>
-<script src="/static/lib/format/base.js"></script>
-<script src="/static/lib/format/jsformat.js"></script>
-<script src="/static/lib/polipop/polipop.min.js"></script>
-<script src="/static/js/clipboard.min.js"></script>
+<script type="text/javascript" src="/static/js/axios.min.js"></script>
+<script type="text/javascript" src="/static/js/jshint.min.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/codemirror.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/fold/brace-fold.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/fold/comment-fold.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/fold/foldcode.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/fold/foldgutter.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/hint/javascript-hint.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/hint/show-hint.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/lint/lint.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/lint/javascript-lint.js"></script>
+<script type="text/javascript" src="/static/lib/codemirror/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="/static/lib/format/base.js"></script>
+<script type="text/javascript" src="/static/lib/format/jsformat.js"></script>
+<script type="text/javascript" src="/static/lib/polipop/polipop.min.js"></script>
+<script type="text/javascript" src="/static/js/clipboard.min.js"></script>
 <script type="text/javascript">
 
     function codeRun() {
         const src = editor.getValue()
         if ("" === src) {
             showPop('error', '运行代码')
-            return;
+            return
         }
         axios.post('/playground_run', {"script": src}).then(res => {
             if (!!res.data.code && res.data.code === "10000") {
@@ -97,34 +111,35 @@
     }
 
     function codeFormat() {
-        var t = editor.getValue().replace(/^\s+/, "");
-        if (t) {
-            var e = 4
-            var n = " ";
-            return editor.setValue(js_beautify(t, e, n))
+        let src = editor.getValue().replace(/^\s+/, "");
+        if ("" === src) {
+            showPop('error', '没有有效代码')
+            return
         }
-        showPop('error', '格式化的代码值')
+        let e = 4
+        let n = " "
+        editor.setValue(js_beautify(src, e, n))
     }
 
     function codeCompress() {
-        const e = editor.getValue().replace(/^\s+|\s+$/g, "");
-        if ("" === e) {
-            showPop('error', '压缩&复制')
-            return;
+        const src = editor.getValue().replace(/^\s+|\s+$/g, "")
+        if ("" === src) {
+            showPop('error', '没有有效代码')
+            return
         }
-        var n = new Packer;
-        var i = n.pack(e, 0, 0);
+        var n = new Packer
+        var i = n.pack(src, 0, 0)
         editor.setValue(i)
     }
 
     new ClipboardJS("#zipCopy", {
         text: function (t) {
-            let c = editor.getValue()
-            if (c === "") {
+            let src = editor.getValue()
+            if (src === "") {
                 return ""
             }
-            showPop('success', '压缩&复制')
-            return editor.getValue()
+            showPop('success', '√')
+            return src
         }
     })
 
@@ -135,11 +150,47 @@
         indentUnit: 4,
         styleActiveLine: true,
         matchBrackets: true,
-        lineWrapping: true,
         theme: 'monokai',
-        gutters: ['error'],
+        foldGutter: true,
+        lineWrapping: true,
+        gutters: [
+            'CodeMirror-linenumbers',
+            'CodeMirror-foldgutter',
+            'CodeMirror-lint-markers'
+        ],
+        hintOptions: {
+            completeSingle: false
+        },
+        lint: true
     });
-    editor.setValue("module.exports = function(doc, op, tab){\n    // code there...\n    return doc;\n}")
+    const ignore = ['', ' ', '\t', '#', '!', '-', '=', '@', '$', '%', '&', '+', ';',
+        '(', ')', '*', '{', '}', '[', ']'];
+    const ignoreToken = (text) => {
+        if (text && text[0]) {
+            for (const pre in ignore) {
+                if (ignore[pre] === text[0]) {
+                    return true
+                }
+            }
+        } else {
+            return true
+        }
+        return false
+    };
+    editor.on("inputRead", (e, change) => {
+        if (change.origin !== "+input") {
+            return;
+        }
+        const text = change.text
+        if (ignoreToken(text)) {
+            return
+        }
+        editor.showHint()
+    });
+    editor.setValue("module.exports = function(doc, op, tab){"
+        + "\n    // code there..."
+        + "\n    return doc;"
+        + "\n};")
 
     let polipop = new Polipop('mypolipop', {
         closer: false,
