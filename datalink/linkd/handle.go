@@ -9,6 +9,7 @@ import (
 	"data-link-2.0/internal/conf"
 	"data-link-2.0/internal/cst"
 	"data-link-2.0/internal/helper"
+	"data-link-2.0/internal/jsvm"
 	"data-link-2.0/internal/model"
 	"encoding/json"
 	"errors"
@@ -106,6 +107,11 @@ func playgroundRun(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	} else if !val.IsFunction() {
 		outputError2(w, "module.exports 必须是一个函数")
+		return
+	}
+	err = jsvm.Lib(vm, jsvm.Funcs)
+	if err != nil {
+		outputError2(w, err.Error())
 		return
 	}
 	arg := map[string]interface{}{

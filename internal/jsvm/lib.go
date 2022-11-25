@@ -11,6 +11,27 @@ import (
 	"time"
 )
 
+var Funcs = []string{
+	"ifnull",
+	"pad",
+	"trim",
+	"startwith",
+	"endwith",
+	"strtoupper",
+	"strtolower",
+	"strrev",
+	"strtotime",
+	"date",
+	"now",
+	"ceil",
+	"floor",
+	"round",
+	"rand",
+	"abs",
+	"max",
+	"min",
+	"isNumber",
+}
 var funMap = map[string]func(*otto.Otto) error{
 	"ifnull":     ifnull,     // 判断空
 	"pad":        pad,        // 填充字符串

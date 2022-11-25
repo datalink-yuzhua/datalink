@@ -868,28 +868,7 @@ func (m *Flow) buildIn(t *Task) error {
 	if m.VM == nil {
 		return errors.New("需要初始化otto虚拟机")
 	}
-	funcs := []string{
-		"ifnull",
-		"pad",
-		"trim",
-		"startwith",
-		"endwith",
-		"strtoupper",
-		"strtolower",
-		"strrev",
-		"strtotime",
-		"date",
-		"now",
-		"ceil",
-		"floor",
-		"round",
-		"rand",
-		"abs",
-		"max",
-		"min",
-		"isNumber",
-	}
-	err := jsvm.Lib(m.VM, funcs)
+	err := jsvm.Lib(m.VM, jsvm.Funcs)
 	if err != nil {
 		return err
 	}
