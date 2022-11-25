@@ -1,0 +1,54 @@
+{
+    "pipeline": [],
+    "resource": [
+        {
+            "desc": "mq1",
+            "dsn": "amqp://user:pass@host:5672/vhost",
+            "host": "",
+            "id": "mq1",
+            "pass": "",
+            "port": "",
+            "type": "rabbitmq",
+            "user": ""
+        },
+        {
+            "desc": "mq2",
+            "dsn": "amqp://user:pass@host:5672/vhost",
+            "host": "",
+            "id": "mq2",
+            "pass": "",
+            "port": "",
+            "type": "rabbitmq",
+            "user": ""
+        }
+    ],
+    "setup": {
+        "desc": "mq2mq",
+        "error_record": true
+    },
+    "source": [
+        {
+            "document_set": "que1",
+            "extra": {
+                "exchange": "amq.direct",
+                "queue_name": "datalink.demo.que",
+                "routing_key": "rk1"
+            },
+            "resource_id": "mq1",
+            "sync_mode": "stream"
+        }
+    ],
+    "target": [
+        {
+            "document_set": {
+                "que1": "que1"
+            },
+            "extra": {
+                "exchange": "amq.direct",
+                "queue_name": "datalink.demo.que2",
+                "routing_key": "rk2"
+            },
+            "resource_id": "mq2"
+        }
+    ]
+}

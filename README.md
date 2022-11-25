@@ -2,6 +2,8 @@
 
 MySQL数据同步到ElasticSearch中,全文检索的解决方案.
 
+新增:RabbitMQ支持
+
 特点:
 
 - 业务代码零侵入,不需要额外的业务代码.
