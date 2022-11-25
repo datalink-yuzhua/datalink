@@ -10,6 +10,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/olivere/elastic/v7 v7.0.29
 	github.com/pingcap/errors v0.11.5-0.20201126102027-b0a155152ca3
+	github.com/rabbitmq/amqp091-go v1.5.0
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sirupsen/logrus v1.8.1
 	github.com/xwb1989/sqlparser v0.0.0-20180606152119-120387863bf2
@@ -29,7 +30,7 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect

@@ -6,6 +6,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/client"
 	"github.com/go-mysql-org/go-mysql/mysql"
 	elastic7 "github.com/olivere/elastic/v7"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"strings"
 )
 
@@ -29,6 +30,18 @@ func ElasticSearchConn(rc conf.Resource) (*elastic7.Client, error) {
 func MySQLConn(rc conf.Resource) (*client.Conn, error) {
 	addr := fmt.Sprintf("%s:%s", rc.Host, rc.Port)
 	return client.Connect(addr, rc.User, rc.Pass, "")
+}
+
+// RabbitMQConn 连接
+func RabbitMQConn(rc conf.Resource) (*amqp.Connection, error) {
+	amqpURI := fmt.Sprintf("%s:%s", rc.Host, rc.Port)
+	config := amqp.Config{Properties: amqp.NewConnectionProperties()}
+	config.Properties.SetClientConnectionName("datalink-consumer")
+	conn, err := amqp.DialConfig(amqpURI, config)
+	if err != nil {
+		return nil, fmt.Errorf("Dial: %s", err)
+	}
+	return conn, nil
 }
 
 // MySQLReadResultToSlice 读取数据结果

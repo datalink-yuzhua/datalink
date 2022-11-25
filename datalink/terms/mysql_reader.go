@@ -16,7 +16,6 @@ import (
 	"github.com/pingcap/errors"
 	"github.com/xwb1989/sqlparser"
 	"io/ioutil"
-	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -85,8 +84,6 @@ func (_this *MySQLReader) clientInstance(force bool) (*client.Conn, error) {
 	}
 	if !force {
 		if time.Now().Sub(_this.latestConnTime).Hours() > 4 {
-			force = true
-		} else if rand.Int()/10000 == 0 {
 			force = true
 		}
 	}
