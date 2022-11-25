@@ -26,6 +26,7 @@ _test
 
 /app/datalink/*.exe
 /app/datalink/datalink
+/runtime/log/*
 /runtime/error/*
 /runtime/resume/*
 /runtime/task/*
