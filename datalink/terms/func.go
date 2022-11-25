@@ -34,7 +34,7 @@ func MySQLConn(rc conf.Resource) (*client.Conn, error) {
 
 // RabbitMQConn 连接
 func RabbitMQConn(rc conf.Resource) (*amqp.Connection, error) {
-	amqpURI := fmt.Sprintf("%s:%s", rc.Host, rc.Port)
+	amqpURI := rc.Dsn
 	config := amqp.Config{Properties: amqp.NewConnectionProperties()}
 	config.Properties.SetClientConnectionName("datalink-consumer")
 	conn, err := amqp.DialConfig(amqpURI, config)

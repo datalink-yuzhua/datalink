@@ -86,7 +86,7 @@ func (_this *RabbitMQWriter) Run(ch chan []*msg.Op, errC chan error, call func(i
 	tk := time.NewTicker(timeout)
 	for {
 		if _this.exitF {
-			if len(cacheList) >= 0 {
+			if len(cacheList) > 0 {
 				_this.Write(cacheList)
 			}
 			tk.Stop()
@@ -158,7 +158,7 @@ func (_this *RabbitMQWriter) Stop() {
 
 // Release 清理资源
 func (_this *RabbitMQWriter) Release() {
-	log.Info("rabbitmq target stop")
+	log.Info("消息队列写入关闭")
 	if _this.channel != nil {
 		_this.channel.Close()
 		_this.channel = nil

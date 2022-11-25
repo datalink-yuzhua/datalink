@@ -16,6 +16,7 @@ type RabbitMQReader struct {
 	client           *amqp.Connection // mq客户端
 	ch               *amqp.Channel    // channel
 	latestConnTime   time.Time        // 上一次连接时间
+	consumerTag      string           // consumerTag
 }
 
 // NewRabbitMQReader rabbit 客户端
@@ -26,6 +27,7 @@ func NewRabbitMQReader(id int, tid string, rc conf.Resource, sc conf.Reader) *Ra
 	reader.SourceConf = sc
 	reader.ResourceConf = rc
 	reader.err = EmptyError
+	reader.consumerTag = fmt.Sprintf("datalink-consumer-%d", time.Now().Unix())
 	return reader
 }
 
@@ -54,6 +56,7 @@ func (_this *RabbitMQReader) clientInstance(flush bool) (*amqp.Connection, error
 		}
 		_this.latestConnTime = time.Now()
 		_this.client = cc
+		_this.ch, _ = cc.Channel()
 	}
 	return cc, err
 }
@@ -81,30 +84,25 @@ func (_this *RabbitMQReader) Run(opC chan *msg.Op, errC chan error) {
 	}()
 
 	// 当为stream时需要监控退出
-	switch _this.SourceConf.SyncMode {
-	case cst.SyncModeReplica, cst.SyncModeStream:
+	if _this.SourceConf.SyncMode == cst.SyncModeStream {
 		_this.exitWG.Add(1)
 		go func() {
 			defer func() {
 				_this.exitWG.Done()
 			}()
 
-			tk := time.NewTicker(1 * time.Second)
+			tk := time.NewTicker(2 * time.Second)
 			for {
 				select {
 				case <-tk.C:
-					if !_this.exitF {
-						continue
-					}
-					if _this.ch != nil {
-						err := _this.ch.Close()
-						if err != nil {
-							_this.errC <- err
-							return
+					if _this.exitF {
+						tk.Stop()
+						if _this.ch != nil {
+							// 关闭channel
+							_this.ch.Cancel(_this.consumerTag, true)
 						}
-						_this.ch = nil
+						return
 					}
-					return
 				}
 			}
 		}()
@@ -112,6 +110,7 @@ func (_this *RabbitMQReader) Run(opC chan *msg.Op, errC chan error) {
 
 	// 等待读取结束
 	_this.exitWG.Wait()
+	_this.Clear()
 }
 
 // Stop 停止任务
@@ -134,11 +133,14 @@ func (_this *RabbitMQReader) Err() error {
 // Clear 清理资源
 func (_this *RabbitMQReader) Clear() {
 	_this.Release()
-	_this.errC = nil
 }
 
 // Release 释放资源
 func (_this *RabbitMQReader) Release() {
+	if _this.ch != nil && !_this.ch.IsClosed() {
+		_this.ch.Close()
+		_this.ch = nil
+	}
 	if _this.client != nil && !_this.client.IsClosed() {
 		_this.client.Close()
 		_this.client = nil
@@ -163,33 +165,29 @@ func (_this *RabbitMQReader) RelateOneByMany(documentSet string, wheres []map[st
 
 // Stream 流读取
 func (_this *RabbitMQReader) Stream(opC chan *msg.Op) {
-	instance, err := _this.clientInstance(true)
+	_, err := _this.clientInstance(true)
 	if err != nil {
 		_this.err = err
 		return
 	}
-	ch, err := instance.Channel()
-	if err == nil {
-		_this.err = err
-		return
-	}
+	ch := _this.ch
 
 	// 不定义queue,直接从queue中取值
-	queueName := _this.fmtValue(_this.SourceConf.Extra, "queue_name")
-	routingKey := _this.fmtValue(_this.SourceConf.Extra, "routing_key")
-	exchange := _this.fmtValue(_this.SourceConf.Extra, "exchange")
+	que := _this.fmtValue(_this.SourceConf.Extra, "queue_name")
+	rk := _this.fmtValue(_this.SourceConf.Extra, "routing_key")
+	ex := _this.fmtValue(_this.SourceConf.Extra, "exchange")
 
 	// 主键字段,不然不能更新
 	pkField := _this.fmtValue(_this.SourceConf.Extra, "pk_field")
 
-	err = ch.QueueBind(queueName, routingKey, exchange, false, nil)
+	err = ch.QueueBind(que, rk, ex, false, nil)
 	if err != nil {
 		_this.err = err
 		return
 	}
 	deliveryC, err := ch.Consume(
-		queueName,
-		"",
+		que,
+		_this.consumerTag,
 		true,
 		false,
 		false,
@@ -207,7 +205,10 @@ func (_this *RabbitMQReader) Stream(opC chan *msg.Op) {
 		}
 		var msgBody map[string]interface{}
 		select {
-		case d := <-deliveryC:
+		case d, ok := <-deliveryC:
+			if !ok {
+				continue
+			}
 			err := json.Unmarshal(d.Body, &msgBody)
 			if err != nil {
 				_this.errC <- err

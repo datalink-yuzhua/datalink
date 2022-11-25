@@ -19,16 +19,18 @@ func InSyncMode(t string) bool {
 	return true
 }
 
+const ResourceTypeEmpty = "empty"
 const ResourceTypeMysql = "mysql"
 const ResourceTypeElasticsearch = "elasticsearch"
-const ResourceTypeEmpty = "empty"
+const ResourceTypeRabbitMQ = "rabbitmq"
 
 // InResourceType 支持的资源类型
 func InResourceType(t string) bool {
 	switch t {
+	case ResourceTypeEmpty:
 	case ResourceTypeMysql:
 	case ResourceTypeElasticsearch:
-	case ResourceTypeEmpty:
+	case ResourceTypeRabbitMQ:
 	default:
 		return false
 	}

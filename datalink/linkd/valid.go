@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/client"
 	elastic7 "github.com/olivere/elastic/v7"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"strings"
 )
 
@@ -108,12 +109,12 @@ func ValidConnects(c map[string]interface{}) (map[string]map[string]interface{},
 		switch rt {
 		case cst.ResourceTypeEmpty:
 			// pass 不做任何检查
-		case cst.ResourceTypeElasticsearch:
-			// 检查elasticsearch服务
-			err = ValidConnectES(r)
 		case cst.ResourceTypeMysql:
-			// 检查mysql服务
 			err = ValidConnectMysql(r)
+		case cst.ResourceTypeElasticsearch:
+			err = ValidConnectES(r)
+		case cst.ResourceTypeRabbitMQ:
+			err = ValidConnectRabbitMQ(r)
 		}
 		if err != nil {
 			bts, _ := json.Marshal(r)
@@ -150,6 +151,22 @@ func ValidConnectES(c map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// ValidConnectRabbitMQ 检查RabbitMQ
+func ValidConnectRabbitMQ(c map[string]interface{}) error {
+	amqpURI, ok := GetMapString(c, "dsn")
+	if !ok || amqpURI == "" {
+		return fmt.Errorf("RabbitMQ连接只支持dsn格式:amqp://user:pwd@host:5672/vhost")
+	}
+	config := amqp.Config{Properties: amqp.NewConnectionProperties()}
+	config.Properties.SetClientConnectionName("datalink-consumer")
+	conn, err := amqp.DialConfig(amqpURI, config)
+	if err != nil {
+		return fmt.Errorf("Dial: %s", err)
+	}
+	conn.Close()
 	return nil
 }
 
@@ -309,6 +326,23 @@ func ValidSource(c map[string]interface{}, conn map[string]map[string]interface{
 				supportMode = map[string]bool{
 					cst.SyncModeDirect: true,
 					cst.SyncModeEmpty:  true,
+				}
+			case cst.ResourceTypeRabbitMQ:
+				supportMode = map[string]bool{
+					cst.SyncModeStream: true,
+					cst.SyncModeEmpty:  true,
+				}
+				extra, ok := GetMapSI(v, "extra")
+				if !ok {
+					return nil, fmt.Errorf("source 资源类型:%s 必须包含参数:queue_name,exchange,routing_key", resourceType)
+				}
+
+				must := []string{"queue_name", "exchange", "routing_key"}
+				for _, f := range must {
+					v, ok := extra[f]
+					if !ok || v == "" {
+						return nil, fmt.Errorf("source 资源类型:%s 必须包含参数:%s", resourceType, f)
+					}
 				}
 			}
 			_, ok = supportMode[syncMode]

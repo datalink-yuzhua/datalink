@@ -240,8 +240,9 @@ func (_this *Task) buildTarget() bool {
 			imp = terms.NewMySQLWriter(i, _this.Uuid, s, v)
 		case cst.ResourceTypeElasticsearch:
 			imp = terms.NewElasticsearchWriter(i, _this.Uuid, s, v)
+		case cst.ResourceTypeRabbitMQ:
+			imp = terms.NewRabbitMQWriter(i, _this.Uuid, s, v)
 		default:
-			// cst.ResourceTypeObs
 			_this.ErrC <- errors.New("no support target type")
 			return false
 		}
@@ -272,6 +273,8 @@ func (_this *Task) buildSource() bool {
 			imp = terms.NewMySQLReader(i, _this.Uuid, s, v)
 		case cst.ResourceTypeElasticsearch:
 			imp = terms.NewElasticsearchReader(i, _this.Uuid, s, v)
+		case cst.ResourceTypeRabbitMQ:
+			imp = terms.NewRabbitMQReader(i, _this.Uuid, s, v)
 		default:
 			_this.ErrC <- errors.New("no support source type")
 			return false
@@ -289,7 +292,7 @@ func (_this *Task) GetSourceImp(resourceId string) (v terms.ReaderRunImp, ok boo
 
 // runTarget
 func (_this *Task) runTarget() {
-	log.Info("runTarget")
+	log.Info("运行写入")
 	for _, v := range _this.writerM {
 		_this.taskWG.Add(1)
 		go func(imp terms.WriterTermImp) {
@@ -313,6 +316,8 @@ func (_this *Task) runTarget() {
 				ds = a.TargetConf.DocumentSet
 			case *terms.ElasticsearchWriter:
 				ds = a.TargetConf.DocumentSet
+			case *terms.RabbitMQWriter:
+				ds = a.TargetConf.DocumentSet
 			}
 
 			var ok bool
@@ -332,7 +337,7 @@ func (_this *Task) runTarget() {
 
 // runSource 读取事件
 func (_this *Task) runSource() {
-	log.Info("runSource")
+	log.Info("运行读取")
 	for _, v := range _this.readerM {
 		_this.taskWG.Add(1)
 		go func(imp terms.ReaderRunImp) {
@@ -365,7 +370,7 @@ func (_this *Task) runSource() {
 
 // runPipeline
 func (_this *Task) runDirectPipeline() {
-	log.Info("runDirectPipeline")
+	log.Info("运行工作台")
 	go func() {
 		tk := time.NewTicker(2 * time.Second)
 		defer func() {
@@ -381,7 +386,7 @@ func (_this *Task) runDirectPipeline() {
 			case <-tk.C:
 				// 不可使用t.exitF判断退出
 				if _this.ReadDone && _this.WriteDone {
-					log.Info("runDirectPipeline stop")
+					log.Info("工作台关闭")
 					return
 				}
 			case op, ok := <-_this.readOpC:
@@ -423,7 +428,7 @@ func (_this *Task) runDirectPipeline() {
 
 // runErrorChan 运行一个errorChan 用于记录,读写错误
 func (_this *Task) runErrorChan() {
-	log.Info("runErrorChan")
+	log.Info("运行错误管道")
 	go func() {
 		tk := time.NewTicker(2 * time.Second)
 		defer func() {
@@ -431,7 +436,7 @@ func (_this *Task) runErrorChan() {
 				log.Error(e)
 			}
 			tk.Stop()
-			log.Info("runErrorChan stop")
+			log.Info("错误管道关闭")
 		}()
 
 		// 初始化日志
