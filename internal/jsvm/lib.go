@@ -115,7 +115,7 @@ func pad(vm *otto.Otto) error {
 	})
 }
 
-// trim 去掉空白字符 trim(str, ch, d)
+// trim 去掉空白字符 trim(str, ch, direction)
 func trim(vm *otto.Otto) error {
 	return vm.Set("trim", func(call otto.FunctionCall) otto.Value {
 		l := len(call.ArgumentList)

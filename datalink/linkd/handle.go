@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/olivere/elastic/v7"
+	"github.com/robertkrimen/otto"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -75,6 +76,48 @@ func playground(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 	bts, _ := ioutil.ReadFile(file)
 	fmt.Fprint(w, string(bts))
+}
+
+// playgroundRun otto运行虚拟机
+func playgroundRun(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	input, err := formatBodyJSON(r)
+	if err != nil {
+		outputError2(w, err.Error())
+		return
+	}
+	srcVal, ok := input["script"]
+	src, _ := srcVal.(string)
+	if !ok || src == "" {
+		outputError2(w, "代码错误")
+		return
+	}
+	vm := otto.New()
+	if err = vm.Set("module", make(map[string]interface{})); err != nil {
+		outputError2(w, err.Error())
+		return
+	}
+	if _, err = vm.Run(src); err != nil {
+		outputError2(w, err.Error())
+		return
+	}
+	val, err := vm.Run("module.exports")
+	if err != nil {
+		outputError2(w, err.Error())
+		return
+	} else if !val.IsFunction() {
+		outputError2(w, "module.exports 必须是一个函数")
+		return
+	}
+	arg := map[string]interface{}{
+		"name": "name1",
+		"age":  20,
+	}
+	_, err = vm.Call("module.exports", nil, arg, "insert", "dbname.tableName")
+	if err != nil {
+		outputError2(w, err.Error())
+		return
+	}
+	outputSuccess(w, true)
 }
 
 // 将输入转为JSON

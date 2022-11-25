@@ -3,12 +3,29 @@
     <title>playground!</title>
     <style>
         #editor {
-            width: 80%;
-            height: 410px;
+            margin-top: 5px;
+            width: 800px;
+            height: auto;
+            float: left;
+        }
+
+        #funcs {
+            float: left;
+            width: 390px;
+            height: auto;
         }
 
         .CodeMirror {
-            height: 400px !important;
+            height: 500px !important;
+        }
+
+        .CodeMirror-scroll {
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin: 0;
         }
     </style>
     <link rel="stylesheet" href="/static/css/app.css"/>
@@ -18,9 +35,32 @@
     <link rel="stylesheet" href="/static/lib/codemirror/monokai.css"/>
 </head>
 <body>
-<div style="max-width: 1200px;margin: 0 auto;">
+<div style="max-width: 1200px;margin: 20px auto;">
     <div id="editor">
         <textarea id="code" name="code" style="display: none"></textarea>
+    </div>
+    <div id="funcs">
+        <ul>
+            <li>ifnull(value, default) 判断空</li>
+            <li>pad(str, pad_char, number, direction) 填充字符串</li>
+            <li>trim(str, ch, direction) 去掉字符串两边字符</li>
+            <li>startwith(str, prefix) 检查字符串是否以指定字符开始</li>
+            <li>endwith(str, suffix) 检查字符串是否以指定字符结束</li>
+            <li>strtoupper(str) 字符转大写</li>
+            <li>strtolower(str) 字符转小写</li>
+            <li>strrev(str) 字符翻转</li>
+            <li>strtotime(str) 将Y-m-d H:i:s 转为 时间戳10位</li>
+            <li>date('Y-m-d', timestamp) (Y-m-d|Y-m-d H:i:s)格式化日期</li>
+            <li>now() 当前时间戳(10位)</li>
+            <li>ceil(number) 向上取整</li>
+            <li>floor(number) 向下取整</li>
+            <li>round(number) 四舍五入</li>
+            <li>rand(min, max) 随机数</li>
+            <li>abs(number) 绝对值</li>
+            <li>max(array) 数组中的最大值</li>
+            <li>min(array) 数组中的最小值</li>
+            <li>isNumber(number) 数字</li>
+        </ul>
     </div>
     <div id="toolbar" style="margin-bottom: 10px">
         <button class="button-24 button-24-green button-24-mid" role="button" onclick="codeRun()">Play</button>
@@ -31,6 +71,7 @@
     </div>
 </div>
 
+<script src="/static/js/axios.min.js"></script>
 <script src="/static/lib/codemirror/codemirror.js"></script>
 <script src="/static/lib/codemirror/mode/javascript/javascript.js"></script>
 <script src="/static/lib/format/base.js"></script>
@@ -40,7 +81,18 @@
 <script type="text/javascript">
 
     function codeRun() {
-        //    TODO:使用虚拟机运行代码
+        const src = editor.getValue()
+        if ("" === src) {
+            showPop('error', '运行代码')
+            return;
+        }
+        axios.post('/playground_run', {"script": src}).then(res => {
+            if (!!res.data.code && res.data.code === "10000") {
+                showPop('success', res.data.data)
+            } else {
+                showPop('error', res.data.msg)
+            }
+        })
     }
 
     function codeFormat() {
@@ -57,6 +109,7 @@
         const e = editor.getValue().replace(/^\s+|\s+$/g, "");
         if ("" === e) {
             showPop('error', '压缩&复制')
+            return;
         }
         var n = new Packer;
         var i = n.pack(e, 0, 0);
@@ -83,7 +136,9 @@
         matchBrackets: true,
         lineWrapping: true,
         theme: 'monokai',
+        gutters: ['error'],
     });
+    editor.setValue("module.exports = function(doc, op, tab){\n// code there...\n    return doc;\n}")
 
     let polipop = new Polipop('mypolipop', {
         closer: false,
@@ -101,13 +156,13 @@
             polipop.add({
                 type: 'success',
                 title: '提示',
-                content: msg + '成功'
+                content: msg
             });
         } else if (type === 'error') {
             polipop.add({
                 type: 'error',
                 title: '提示',
-                content: msg + '失败'
+                content: msg
             });
         }
     }
