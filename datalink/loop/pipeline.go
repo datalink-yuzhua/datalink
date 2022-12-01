@@ -850,10 +850,6 @@ func (m *Flow) vmExportValue(val otto.Value) (interface{}, error) {
 		if e != nil {
 			continue
 		}
-		if key == "goods_industry" {
-			log.Info(v.Class())
-			log.Info(v.IsObject())
-		}
 		if v.IsObject() && v.Class() != "Array" && v.Class() != "GoArray" {
 			mi[key], _ = m.vmExportValue(v)
 		} else {
