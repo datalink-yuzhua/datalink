@@ -67,11 +67,11 @@
     "desc": "",
     "dsn": "",
     "extra": null,
-    "host": "http://db-01.yuzhua-test.com",
+    "host": "http://db-01.test.com",
     // 检测成功之后,会返回id.
     "id": "18126dee-3d78-42a4-a24f-ec78b524b9fb",
-    "pass": "Ie#5D8FG@4fC7gJ9y+",
-    "port": "43092",
+    "pass": "pass",
+    "port": "80",
     "type": "elasticsearch",
     "user": "elastic"
   },
@@ -210,12 +210,12 @@
     },
     {
       "extra": null,
-      "host": "db-01.yuzhua-test.com",
+      "host": "db-01.test.com",
       "id": "bf907d93-e499-449f-92f2-cd2f057450bc",
-      "pass": "Ie#5D8FG@4fC7gJ9y+",
-      "port": "43092",
+      "pass": "pass",
+      "port": "80",
       "type": "elasticsearch",
-      "dsn": "http://db-01.yuzhua-test.com:43092",
+      "dsn": "",
       "user": "elastic"
     }
   ],
