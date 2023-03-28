@@ -7,6 +7,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/mysql"
 	elastic7 "github.com/olivere/elastic/v7"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"os"
 	"strings"
 )
 
@@ -30,6 +31,11 @@ func ElasticSearchConn(rc conf.Resource) (*elastic7.Client, error) {
 func MySQLConn(rc conf.Resource) (*client.Conn, error) {
 	addr := fmt.Sprintf("%s:%s", rc.Host, rc.Port)
 	return client.Connect(addr, rc.User, rc.Pass, "")
+}
+
+// PlainTextConn 连接
+func PlainTextConn(rc conf.Resource) (*os.File, error) {
+	return os.Open(rc.Dsn)
 }
 
 // RabbitMQConn 连接

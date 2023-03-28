@@ -23,6 +23,7 @@ const ResourceTypeEmpty = "empty"
 const ResourceTypeMysql = "mysql"
 const ResourceTypeElasticsearch = "elasticsearch"
 const ResourceTypeRabbitMQ = "rabbitmq"
+const ResourceTypePlaintext = "plaintext"
 
 // InResourceType 支持的资源类型
 func InResourceType(t string) bool {
@@ -31,6 +32,7 @@ func InResourceType(t string) bool {
 	case ResourceTypeMysql:
 	case ResourceTypeElasticsearch:
 	case ResourceTypeRabbitMQ:
+	case ResourceTypePlaintext:
 	default:
 		return false
 	}

@@ -275,8 +275,10 @@ func (_this *Task) buildSource() bool {
 			imp = terms.NewElasticsearchReader(i, _this.Uuid, s, v)
 		case cst.ResourceTypeRabbitMQ:
 			imp = terms.NewRabbitMQReader(i, _this.Uuid, s, v)
+		case cst.ResourceTypePlaintext:
+			imp = terms.NewPlainTextReader(i, _this.Uuid, s, v)
 		default:
-			_this.ErrC <- errors.New("no support source type")
+			_this.ErrC <- errors.New("不支持的数据来源类型")
 			return false
 		}
 		_this.readerM[v.ResourceId] = imp
@@ -317,6 +319,8 @@ func (_this *Task) runTarget() {
 			case *terms.ElasticsearchWriter:
 				ds = a.TargetConf.DocumentSet
 			case *terms.RabbitMQWriter:
+				ds = a.TargetConf.DocumentSet
+			case *terms.PlaintextWriter:
 				ds = a.TargetConf.DocumentSet
 			}
 
